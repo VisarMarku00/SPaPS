@@ -1,4 +1,4 @@
-namespace SpaPS.Models
+namespace SPaPS.Models
 {
     public class ErrorViewModel
     {

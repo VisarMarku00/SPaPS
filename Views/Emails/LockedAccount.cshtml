@@ -3,16 +3,15 @@
     ViewBag.Title = "";
 }
 
-@section EmailHeader{
-Subject: Заклучен профил
+@section EmailHeader{Subject: Locked profile
 }
 
-    <p>Почитувани,</p>
+<p>Dear,</p>
 
-    <p>
-        Вашиот профил е заклучен. Обратете се кај администратор за ви го отклучи,
-        а потоа кликнете на линкот за да ја промените лозинката:
-    </p>
-    <p>
-        @ViewBag.Callback
-    </p>
+<p>
+        Your profile is locked. Contact an administrator to unlock it for you,
+        and then click the link to change your password:
+</p>
+<p>
+    @ViewBag.Callback
+</p>

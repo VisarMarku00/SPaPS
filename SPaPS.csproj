@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>aspnet-SpaPS-4C49A8A5-A41F-48E2-9F36-5EA46333D2B2</UserSecretsId>
+    <UserSecretsId>aspnet-SPaPS-D68BAA73-26F2-4AC8-AEC1-4EA5E0F405E6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +13,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="4.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.8" />
+    <PackageReference Include="PasswordGenerator" Version="2.1.0" />
     <PackageReference Include="Postal.AspNetCore" Version="2.6.0" />
   </ItemGroup>
 

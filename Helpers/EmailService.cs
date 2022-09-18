@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Services
 {
-    public class MessageModel : Postal   .Email
+    public class MessageModel : Postal.Email
     {
         protected MessageModel() : base()
         {
@@ -176,7 +176,7 @@ namespace DataAccess.Services
             emailData.ViewData["Password"] = model.Password;
             emailData.ViewData["Callback"] = model.Callback;
 
-            if (model.Attachments.Count > 0)
+            if(model.Attachments.Count > 0)
                 emailData.Attachments = model.Attachments;
 
             MailMessage message = await _emailService.CreateMailMessageAsync(emailData);

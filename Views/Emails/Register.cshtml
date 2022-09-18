@@ -3,21 +3,19 @@
     ViewBag.Title = "";
 }
 
-@section EmailHeader{
-Subject: Нов корисник
-}
+@section EmailHeader{Subject: Нов корисник}
 
     <p>
-        Почитувани,
+        Dear,
     </p>
     <p>
-        Креиран е нов корисник со,
+        A new user has been created with,
     </p>
     <p>
-        Корисничко име: <b>@ViewBag.Username</b> <br />
-        Емаил: <b>@ViewBag.Email</b> <br />
-        Лозинка: <b>@ViewBag.Password</b>
+        Username: <b>@ViewBag.Username</b> <br />
+        Email: <b>@ViewBag.Email</b> <br />
+        Password: <b>@ViewBag.Password</b>
     </p>
     <p>
-        За да ја завршите регистрациjaта и потврдите емаил адресата, кликнете на следниов <a href="@ViewBag.Callback">линк</a>.
+        To complete the registration and confirm the email address, click on the following <a href="@ViewBag.Callback">link</a>.
     </p>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace SpaPS.Data
+namespace SPaPS.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {

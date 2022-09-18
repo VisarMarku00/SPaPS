@@ -1,70 +1,82 @@
-﻿@model SPaPS.Models.AccountModels.RegisterModel;
+﻿@model SPaPS.Models.AccountModels.RegisterModel
 
 @{
-    ViewData["Title"] = "Register account";
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Register account</h2>
-<form asp-action="Register">
+<h2>Register</h2>
+<br />
 
+<form asp-action="Register" method="post">
     <div class="row">
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="Email" type="email" class="form-control" placeholder="name@example.com">
+                <input asp-for="Email" type="email" class="form-control" placeholder="name@example.com" >
                 <label asp-for="Email"></label>
+                @Html.ValidationMessageFor(model =>model.Email )
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="Password" type="password" class="form-control" placeholder="Password">
-                <label asp-for="Password"></label>
-            </div>
-        </div>
-        <div class="col-md-3" col-6>
-            <div class="form-floating mb-3">
-                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="070xxxxxx">
+                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="PhoneNumber">
                 <label asp-for="PhoneNumber"></label>
+                @Html.ValidationMessageFor(model =>model.PhoneNumber )
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="Name" type="text" class="form-control" placeholder="Name">
+                <input asp-for="Name" type="text" class="form-control" placeholder="Name" >
                 <label asp-for="Name"></label>
+                @Html.ValidationMessageFor(model =>model.Name )
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="Address" type="text" class="form-control" placeholder="Address">
+                <input asp-for="Address" type="text" class="form-control" placeholder="Address" >
                 <label asp-for="Address"></label>
+                @Html.ValidationMessageFor(model =>model.Address )
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="ClientTypeId" type="text" class="form-control" placeholder="ClientTypeId">
-                <label asp-for="ClientTypeId"></label>
-            </div>
-        </div>
-        <div class="col-md-3" col-6>
-            <div class="form-floating mb-3">
-                <input asp-for="IdNo" type="text" class="form-control" placeholder="IdNo">
+                <input asp-for="IdNo" type="text" class="form-control" placeholder="IdNo" >
                 <label asp-for="IdNo"></label>
+                @Html.ValidationMessageFor(model =>model.IdNo )
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="CityId" type="text" class="form-control" placeholder="CityId">
+                <input asp-for="ClientTypeId" type="text" class="form-control" placeholder="ClientTypeId" >
+                <label asp-for="ClientTypeId"></label>
+@*                <label asp-for="ClientTypeId" class="control-label"></label>
+                <select asp-for="ClientTypeId" class="form-control" asp-items="ViewBag.Clients"></select>*@
+                @Html.ValidationMessageFor(model =>model.ClientTypeId)
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="form-floating mb-3">
+                <input asp-for="CityId" type="text" class="form-control" placeholder="CityId" >
                 <label asp-for="CityId"></label>
+@*                <label asp-for="CityId" class="control-label"></label>
+                <select asp-for="CityId" class="form-control" asp-items="ViewBag.Clients"></select>*@
+                @Html.ValidationMessageFor(model =>model.CityId)
             </div>
         </div>
-        <div class="col-md-3" col-6>
+        <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="CountryId" type="text" class="form-control" placeholder="CountryId">
+                <input asp-for="CountryId" type="text" class="form-control" placeholder="CountryId" >
                 <label asp-for="CountryId"></label>
+@*                <label asp-for="CountryId" class="control-label"></label>
+                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.Clients"></select>*@
+                @Html.ValidationMessageFor(model =>model.CountryId)
             </div>
         </div>
     </div>
+
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
-<p class="col-12 text-center text-danger"> @Html.ValidationMessage("Error")</p>
-<h4 class="col-12 text-center text-success"> @Html.ValidationMessage("Succes")</h4>
+<p class="col-12 text-center text-danger">@Html.ValidationMessage("Error")</p>
+<h4 class="col-12 text-center text-success">@Html.ValidationMessage("Success")</h4>
+

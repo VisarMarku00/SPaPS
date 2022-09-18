@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SpaPS.Models;
+using SPaPS.Models;
 using System.Diagnostics;
 
-namespace SpaPS.Controllers
+namespace SPaPS.Controllers
 {
     public class HomeController : Controller
     {
