@@ -6,6 +6,9 @@ using SPaPS.Data;
 using DataAccess.Services;
 using SPaPS.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using NuGet.Versioning;
 
 namespace SPaPS.Controllers
 {
@@ -63,6 +66,10 @@ namespace SPaPS.Controllers
             {
                 return View(model);
             }
+
+            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
+            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
+            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
 
             var userExists = await _userManager.FindByEmailAsync(model.Email);
 
@@ -237,6 +244,66 @@ namespace SPaPS.Controllers
             await _signInManager.SignOutAsync();
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult UpdateDetails()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateDetails(UpdateDetailsModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var loggedInUserEmail = User.Identity.Name;
+
+            var currentUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+
+
+            currentUser.PhoneNumber = model.PhoneNumber;
+            currentUser.PhoneNumberConfirmed = true;
+            //IdentityUser user = new IdentityUser()
+            //{
+
+            //    PhoneNumber = model.PhoneNumber,
+            //    EmailConfirmed = true,
+            //    PhoneNumberConfirmed = true
+            //};
+
+            await _userManager.UpdateAsync(currentUser);
+
+            var currentClient = await _context.Clients.FindAsync(currentUser.Id);
+
+            var clientString = currentClient.ToString;
+
+            Client client = new Client
+            { 
+                UserId = currentUser.Id,
+                Name = model.Name,
+                Address = model.Address,
+                IdNo = model.IdNo,
+                ClientTypeId = model.ClientTypeId,
+                CityId = model.CityId,
+                CountryId = model.CountryId
+            };
+
+
+            _context.Update(client);
+            await _context.SaveChangesAsync(); ;
+
+            TempData["Success"] = "Account details changed!";
+
+
+            return View();
         }
     }
 }

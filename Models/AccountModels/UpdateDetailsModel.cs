@@ -1,24 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+
 namespace SPaPS.Models.AccountModels
 {
-    public class RegisterModel
+    public class UpdateDetailsModel
     {
-        [Required(ErrorMessage = "Email required")]
-        [Display(Name = "E-mail")]
-        public string? Email { get; set; }
-
-        [Required(ErrorMessage = "Phone number required")]
+        public string UserId { get; set; } = null!;
+        [Required]
         public string? PhoneNumber { get; set; }
 
-        [Required(ErrorMessage = "Client type required")]
+        [Required]
         [Display(Name = "Client Type")]
         public int ClientTypeId { get; set; }
 
-        [Required(ErrorMessage = "Name required")]
+        [Required]
         public string Name { get; set; } = null!;
 
-        [Required(ErrorMessage = "Address required")]
+        [Required]
         public string Address { get; set; } = null!;
 
         [Required]
@@ -29,10 +27,8 @@ namespace SPaPS.Models.AccountModels
         [Display(Name = "City")]
         public int CityId { get; set; }
 
-        [Required(ErrorMessage = "Country required")]
+        [Required]
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
-
-        public virtual Client Client { get; set; } = null!;
     }
 }
