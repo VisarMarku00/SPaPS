@@ -5,7 +5,6 @@ namespace SPaPS.Models.AccountModels
 {
     public class UpdateDetailsModel
     {
-        public string UserId { get; set; } = null!;
         [Required]
         public string? PhoneNumber { get; set; }
 

@@ -271,37 +271,22 @@ namespace SPaPS.Controllers
 
             currentUser.PhoneNumber = model.PhoneNumber;
             currentUser.PhoneNumberConfirmed = true;
-            //IdentityUser user = new IdentityUser()
-            //{
-
-            //    PhoneNumber = model.PhoneNumber,
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true
-            //};
 
             await _userManager.UpdateAsync(currentUser);
 
-            var currentClient = await _context.Clients.FindAsync(currentUser.Id);
+            var currentClient = await _context.Clients.Where(x => x.UserId == currentUser.Id).FirstOrDefaultAsync();
 
-            var clientString = currentClient.ToString;
+            currentClient.Name = model.Name;
+            currentClient.Address = model.Address;
+            currentClient.IdNo = model.IdNo;
+            currentClient.ClientTypeId = model.ClientTypeId;
+            currentClient.CityId = model.CityId;
+            currentClient.CountryId = model.CountryId;
 
-            Client client = new Client
-            { 
-                UserId = currentUser.Id,
-                Name = model.Name,
-                Address = model.Address,
-                IdNo = model.IdNo,
-                ClientTypeId = model.ClientTypeId,
-                CityId = model.CityId,
-                CountryId = model.CountryId
-            };
-
-
-            _context.Update(client);
+            _context.Update(currentClient);
             await _context.SaveChangesAsync(); ;
 
-            TempData["Success"] = "Account details changed!";
-
+            ModelState.AddModelError("Success", "Details updated!");
 
             return View();
         }
