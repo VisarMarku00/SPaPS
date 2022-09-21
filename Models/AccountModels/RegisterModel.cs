@@ -32,7 +32,5 @@ namespace SPaPS.Models.AccountModels
         [Required(ErrorMessage = "Country required")]
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
-
-        public virtual Client Client { get; set; } = null!;
     }
 }

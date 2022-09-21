@@ -1,27 +1,27 @@
-﻿@model SPaPS.Models.AccountModels.UpdateDetailsModel
+﻿@model SPaPS.Models.AccountModels.ChangeUserInfo
 
 @{
     ViewData["Title"] = "Update Details";
-    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Update Details</h2>
 <br />
 
-<form asp-action="UpdateDetails" method="post">
+<form method="post">
     <div class="row">
-        <div class="col-md-3 col-6">
-            <div class="form-floating mb-3">
-                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="PhoneNumber">
-                <label asp-for="PhoneNumber"></label>
-                @Html.ValidationMessageFor(model =>model.PhoneNumber )
-            </div>
-        </div>
         <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
                 <input asp-for="Name" type="text" class="form-control" placeholder="Name">
                 <label asp-for="Name"></label>
                 @Html.ValidationMessageFor(model =>model.Name )
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="form-floating mb-3">
+                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="PhoneNumber">
+                <label asp-for="PhoneNumber"></label>
+                @Html.ValidationMessageFor(model =>model.PhoneNumber )
             </div>
         </div>
         <div class="col-md-3 col-6">
@@ -40,21 +40,27 @@
         </div>
         <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="ClientTypeId" type="text" class="form-control" placeholder="ClientTypeId">
+                <select asp-for="ClientTypeId" asp-items="@ViewBag.ClientTypes" class="form-select">
+                    <option value="">--Select--</option>
+                </select>
                 <label asp-for="ClientTypeId"></label>
                 @Html.ValidationMessageFor(model =>model.ClientTypeId)
             </div>
         </div>
         <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="CityId" type="text" class="form-control" placeholder="CityId">
+                <select asp-for="CityId" asp-items="@ViewBag.Cities" class="form-select">
+                    <option value="">--Select--</option>
+                </select>
                 <label asp-for="CityId"></label>
                 @Html.ValidationMessageFor(model =>model.CityId)
-            </div>
+            </div> 
         </div>
         <div class="col-md-3 col-6">
             <div class="form-floating mb-3">
-                <input asp-for="CountryId" type="text" class="form-control" placeholder="CountryId">
+                <select asp-for="CountryId" asp-items="@ViewBag.Countries" class="form-select">
+                    <option value="">--Select--</option>
+                </select>
                 <label asp-for="CountryId"></label>
                 @Html.ValidationMessageFor(model =>model.CountryId)
             </div>
@@ -66,3 +72,4 @@
 
 <p class="col-12 text-center text-danger">@Html.ValidationMessage("Error")</p>
 <h4 class="col-12 text-center text-success">@Html.ValidationMessage("Success")</h4>
+ 

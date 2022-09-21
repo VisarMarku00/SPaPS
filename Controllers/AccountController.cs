@@ -249,44 +249,86 @@ namespace SPaPS.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult UpdateDetails()
+        public async Task<IActionResult> ChangeUserInfo()
         {
-            return View();
+            var loggedInUserEmail = User.Identity.Name;
+
+            var applicationUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var clientUser= await _context.Clients.Where(x => x.UserId == applicationUser.Id).FirstOrDefaultAsync();
+
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+
+
+            ChangeUserInfo model = new ChangeUserInfo
+            {
+                Name = clientUser.Name,
+                Address = clientUser.Address,
+                PhoneNumber = applicationUser.PhoneNumber,
+                CityId = clientUser.CityId,
+                IdNo = clientUser.IdNo,
+                CountryId = clientUser.CountryId,
+                ClientTypeId = clientUser.ClientTypeId
+            };
+
+
+            return View(model);
         }
 
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> UpdateDetails(UpdateDetailsModel model)
+        public async Task<IActionResult> ChangeUserInfo(ChangeUserInfo model)
         {
+
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+
             if (!ModelState.IsValid)
             {
+
+                ModelState.AddModelError("Error", "There was an error. Try again!");
+
                 return View(model);
             }
 
             var loggedInUserEmail = User.Identity.Name;
 
-            var currentUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var applicationUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var clientUser = await _context.Clients.Where(x => x.UserId == applicationUser.Id).FirstOrDefaultAsync();
 
+            applicationUser.PhoneNumber = model.PhoneNumber;
 
-            currentUser.PhoneNumber = model.PhoneNumber;
-            currentUser.PhoneNumberConfirmed = true;
+            var appUserResult = await _userManager.UpdateAsync(applicationUser);
 
-            await _userManager.UpdateAsync(currentUser);
+            if (!appUserResult.Succeeded)
+            {
+                ModelState.AddModelError("Error", "There was an error. Try again!");
 
-            var currentClient = await _context.Clients.Where(x => x.UserId == currentUser.Id).FirstOrDefaultAsync();
+                return View(model);
+            }
 
-            currentClient.Name = model.Name;
-            currentClient.Address = model.Address;
-            currentClient.IdNo = model.IdNo;
-            currentClient.ClientTypeId = model.ClientTypeId;
-            currentClient.CityId = model.CityId;
-            currentClient.CountryId = model.CountryId;
+            clientUser.Address = model.Address;
+            clientUser.Name = model.Name;
+            clientUser.CityId = model.CityId;
+            clientUser.CountryId = model.CountryId;
+            clientUser.ClientTypeId = model.ClientTypeId;
+            clientUser.IdNo = model.IdNo;
+            clientUser.UpdatedOn = DateTime.Now;
 
-            _context.Update(currentClient);
-            await _context.SaveChangesAsync(); ;
+            try 
+            {
+                _context.Update(clientUser);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                ModelState.AddModelError("Error", "There was an error. Try again!");
 
-            ModelState.AddModelError("Success", "Details updated!");
+                return View(model);
+            }
 
             return View();
         }
