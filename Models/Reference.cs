@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace SPaPS.Models
 {
     public partial class Reference
     {
         public long ReferenceId { get; set; }
-        [DisplayName("Reference type")]
         public long ReferenceTypeId { get; set; }
         public string Description { get; set; } = null!;
         public string Code { get; set; } = null!;

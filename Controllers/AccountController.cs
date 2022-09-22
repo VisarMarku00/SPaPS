@@ -55,6 +55,10 @@ namespace SPaPS.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+
             return View();
         }
 
@@ -67,9 +71,9 @@ namespace SPaPS.Controllers
                 return View(model);
             }
 
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
 
             var userExists = await _userManager.FindByEmailAsync(model.Email);
 
