@@ -3,8 +3,13 @@
 
 namespace SPaPS.Models.AccountModels
 {
-    public class UpdateDetailsModel
+    public class ChangeUserInfo
     {
+
+        [Required(ErrorMessage = "Email required")]
+        [Display(Name = "E-mail")]
+        public string? Email { get; set; }
+
         [Required]
         public string? PhoneNumber { get; set; }
 

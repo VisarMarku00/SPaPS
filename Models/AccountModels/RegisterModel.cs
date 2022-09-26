@@ -33,6 +33,6 @@ namespace SPaPS.Models.AccountModels
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
 
-        public virtual Client Client { get; set; } = null!;
+        public string Role { get; set; }
     }
 }

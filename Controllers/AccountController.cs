@@ -18,13 +18,15 @@ namespace SPaPS.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly SPaPSContext _context;
         private readonly IEmailSenderEnhance _emailService;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, SPaPSContext context, IEmailSenderEnhance emailService)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, SPaPSContext context, IEmailSenderEnhance emailService, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _emailService = emailService;
+            _roleManager = roleManager;
         }
 
         [HttpGet]
@@ -55,27 +57,22 @@ namespace SPaPS.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+            ViewBag.Roles = new SelectList(_roleManager.Roles.ToList(), "Name", "Name");
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterModel model)
-        {
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
-            //ViewData["References"] = new SelectList(_context.References, "ReferenceType", "Description");
-
+         {
             var userExists = await _userManager.FindByEmailAsync(model.Email);
 
             if (userExists != null)
             {
-                ModelState.AddModelError("Error", "User already exists");
+                ModelState.AddModelError("Error", "Корисникот веќе постои!");
                 return View(model);
             }
 
@@ -97,6 +94,8 @@ namespace SPaPS.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            await _userManager.AddToRoleAsync(user, model.Role);
+
             Client client = new Client()
             {
                 UserId = user.Id,
@@ -115,6 +114,8 @@ namespace SPaPS.Controllers
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             var callback = Url.Action(action: "ResetPassword", controller: "Account", values: new { token, email = user.Email }, HttpContext.Request.Scheme);
+
+            /* https://localhost:5001/Account/ResetPassword?token=123asdrew123&email=nikola.stankovski@foxit.mk */
 
             EmailSetUp emailSetUp = new EmailSetUp()
             {
@@ -249,44 +250,85 @@ namespace SPaPS.Controllers
 
         [HttpGet]
         [Authorize]
-        public IActionResult UpdateDetails()
+        public async Task<IActionResult> ChangeUserInfo()
         {
-            return View();
+            var loggedInUserEmail = User.Identity.Name;
+
+            var applicationUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var clientUser= await _context.Clients.Where(x => x.UserId == applicationUser.Id).FirstOrDefaultAsync();
+
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+
+            ChangeUserInfo model = new ChangeUserInfo
+            {
+                Name = clientUser.Name,
+                Address = clientUser.Address,
+                PhoneNumber = applicationUser.PhoneNumber,
+                CityId = clientUser.CityId,
+                IdNo = clientUser.IdNo,
+                CountryId = clientUser.CountryId,
+                ClientTypeId = clientUser.ClientTypeId
+            };
+
+
+            return View(model);
         }
 
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> UpdateDetails(UpdateDetailsModel model)
+        public async Task<IActionResult> ChangeUserInfo(ChangeUserInfo model)
         {
+
+            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
+            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
+            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+
             if (!ModelState.IsValid)
             {
+
+                ModelState.AddModelError("Error", "There was an error. Try again!");
+
                 return View(model);
             }
 
             var loggedInUserEmail = User.Identity.Name;
 
-            var currentUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var applicationUser = await _userManager.FindByEmailAsync(loggedInUserEmail);
+            var clientUser = await _context.Clients.Where(x => x.UserId == applicationUser.Id).FirstOrDefaultAsync();
 
+            applicationUser.PhoneNumber = model.PhoneNumber;
 
-            currentUser.PhoneNumber = model.PhoneNumber;
-            currentUser.PhoneNumberConfirmed = true;
+            var appUserResult = await _userManager.UpdateAsync(applicationUser);
 
-            await _userManager.UpdateAsync(currentUser);
+            if (!appUserResult.Succeeded)
+            {
+                ModelState.AddModelError("Error", "There was an error. Try again!");
 
-            var currentClient = await _context.Clients.Where(x => x.UserId == currentUser.Id).FirstOrDefaultAsync();
+                return View(model);
+            }
 
-            currentClient.Name = model.Name;
-            currentClient.Address = model.Address;
-            currentClient.IdNo = model.IdNo;
-            currentClient.ClientTypeId = model.ClientTypeId;
-            currentClient.CityId = model.CityId;
-            currentClient.CountryId = model.CountryId;
+            clientUser.Address = model.Address;
+            clientUser.Name = model.Name;
+            clientUser.CityId = model.CityId;
+            clientUser.CountryId = model.CountryId;
+            clientUser.ClientTypeId = model.ClientTypeId;
+            clientUser.IdNo = model.IdNo;
+            clientUser.UpdatedOn = DateTime.Now;
 
-            _context.Update(currentClient);
-            await _context.SaveChangesAsync(); ;
+            try 
+            {
+                _context.Update(clientUser);
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                ModelState.AddModelError("Error", "There was an error. Try again!");
 
-            ModelState.AddModelError("Success", "Details updated!");
+                return View(model);
+            }
 
             return View();
         }

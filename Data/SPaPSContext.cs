@@ -17,6 +17,7 @@ namespace SPaPS.Data
         {
         }
 
+        public virtual DbSet<Activity> Activities { get; set; } = null!;
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; } = null!;
         public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; } = null!;
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; } = null!;
@@ -24,19 +25,34 @@ namespace SPaPS.Data
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; } = null!;
         public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; } = null!;
         public virtual DbSet<Client> Clients { get; set; } = null!;
+        public virtual DbSet<ClientActivity> ClientActivities { get; set; } = null!;
         public virtual DbSet<Reference> References { get; set; } = null!;
         public virtual DbSet<ReferenceType> ReferenceTypes { get; set; } = null!;
+        public virtual DbSet<Request> Requests { get; set; } = null!;
+        public virtual DbSet<Service> Services { get; set; } = null!;
+        public virtual DbSet<ServiceActivity> ServiceActivities { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=LAPTOPIIM-BM;Initial Catalog=SPaPS;Trusted_Connection=True");
+                optionsBuilder.UseSqlServer("Data Source=LAPTOPIIM-BM;Database=SPaPS;Trusted_Connection=True");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Activity>(entity =>
+            {
+                entity.ToTable("Activity");
+
+                entity.Property(e => e.ActivityId).HasColumnName("Activity_Id");
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.Name).HasMaxLength(100);
+            });
+
             modelBuilder.Entity<AspNetRole>(entity =>
             {
                 entity.HasIndex(e => e.NormalizedName, "RoleNameIndex")
@@ -144,6 +160,8 @@ namespace SPaPS.Data
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DateEstablished).HasColumnType("date");
+
                 entity.Property(e => e.IdNo).HasMaxLength(20);
 
                 entity.Property(e => e.Name).HasMaxLength(255);
@@ -153,6 +171,29 @@ namespace SPaPS.Data
                 entity.Property(e => e.UserId)
                     .HasMaxLength(500)
                     .HasColumnName("User_Id");
+            });
+
+            modelBuilder.Entity<ClientActivity>(entity =>
+            {
+                entity.ToTable("ClientActivity");
+
+                entity.Property(e => e.ClientActivityId).HasColumnName("ClientActivity_Id");
+
+                entity.Property(e => e.ActivityId).HasColumnName("Activity_Id");
+
+                entity.Property(e => e.ClientId).HasColumnName("Client_Id");
+
+                entity.HasOne(d => d.Activity)
+                    .WithMany(p => p.ClientActivities)
+                    .HasForeignKey(d => d.ActivityId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ClientActivity_Activity");
+
+                entity.HasOne(d => d.Client)
+                    .WithMany(p => p.ClientActivities)
+                    .HasForeignKey(d => d.ClientId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ClientActivity_ClientActivity");
             });
 
             modelBuilder.Entity<Reference>(entity =>
@@ -203,6 +244,83 @@ namespace SPaPS.Data
                     .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<Request>(entity =>
+            {
+                entity.ToTable("Request");
+
+                entity.Property(e => e.RequestId).HasColumnName("Request_Id");
+
+                entity.Property(e => e.BuildingTypeId).HasColumnName("BuildingType_Id");
+
+                entity.Property(e => e.Color).HasMaxLength(50);
+
+                entity.Property(e => e.CreatedOn)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.FromDate).HasColumnType("date");
+
+                entity.Property(e => e.IsActive)
+                    .HasColumnName("Is_Active")
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.RequestDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ServiceId).HasColumnName("Service_Id");
+
+                entity.Property(e => e.ToDate).HasColumnType("date");
+
+                entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Service)
+                    .WithMany(p => p.Requests)
+                    .HasForeignKey(d => d.ServiceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Request_Request");
+            });
+
+            modelBuilder.Entity<Service>(entity =>
+            {
+                entity.ToTable("Service");
+
+                entity.Property(e => e.ServiceId).HasColumnName("Service_Id");
+
+                entity.Property(e => e.CreatedOn)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.IsActive)
+                    .HasColumnName("Is_Active")
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.UpdatedOn).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ServiceActivity>(entity =>
+            {
+                entity.ToTable("ServiceActivity");
+
+                entity.Property(e => e.ServiceActivityId).HasColumnName("ServiceActivity_Id");
+
+                entity.Property(e => e.ActivityId).HasColumnName("Activity_Id");
+
+                entity.Property(e => e.ServiceId).HasColumnName("Service_Id");
+
+                entity.HasOne(d => d.Activity)
+                    .WithMany(p => p.ServiceActivities)
+                    .HasForeignKey(d => d.ActivityId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ServiceActivity_Activity");
+
+                entity.HasOne(d => d.Service)
+                    .WithMany(p => p.ServiceActivities)
+                    .HasForeignKey(d => d.ServiceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ServiceActivity_Service");
             });
 
             OnModelCreatingPartial(modelBuilder);
