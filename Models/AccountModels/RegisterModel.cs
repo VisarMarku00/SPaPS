@@ -32,5 +32,7 @@ namespace SPaPS.Models.AccountModels
         [Required(ErrorMessage = "Country required")]
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
+
+        public string Role { get; set; }
     }
 }

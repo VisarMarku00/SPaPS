@@ -18,13 +18,15 @@ namespace SPaPS.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly SPaPSContext _context;
         private readonly IEmailSenderEnhance _emailService;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, SPaPSContext context, IEmailSenderEnhance emailService)
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, SPaPSContext context, IEmailSenderEnhance emailService, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _emailService = emailService;
+            _roleManager = roleManager;
         }
 
         [HttpGet]
@@ -58,28 +60,19 @@ namespace SPaPS.Controllers
             ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
             ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
             ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
+            ViewBag.Roles = new SelectList(_roleManager.Roles.ToList(), "Name", "Name");
 
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterModel model)
-        {
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
-            ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
-            ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
-
+         {
             var userExists = await _userManager.FindByEmailAsync(model.Email);
 
             if (userExists != null)
             {
-                ModelState.AddModelError("Error", "User already exists");
+                ModelState.AddModelError("Error", "Корисникот веќе постои!");
                 return View(model);
             }
 
@@ -101,6 +94,8 @@ namespace SPaPS.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            await _userManager.AddToRoleAsync(user, model.Role);
+
             Client client = new Client()
             {
                 UserId = user.Id,
@@ -119,6 +114,8 @@ namespace SPaPS.Controllers
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             var callback = Url.Action(action: "ResetPassword", controller: "Account", values: new { token, email = user.Email }, HttpContext.Request.Scheme);
+
+            /* https://localhost:5001/Account/ResetPassword?token=123asdrew123&email=nikola.stankovski@foxit.mk */
 
             EmailSetUp emailSetUp = new EmailSetUp()
             {
@@ -263,7 +260,6 @@ namespace SPaPS.Controllers
             ViewBag.ClientTypes = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 1).ToList(), "ReferenceId", "Description");
             ViewBag.Cities = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 2).ToList(), "ReferenceId", "Description");
             ViewBag.Countries = new SelectList(_context.References.Where(x => x.ReferenceTypeId == 3).ToList(), "ReferenceId", "Description");
-
 
             ChangeUserInfo model = new ChangeUserInfo
             {
