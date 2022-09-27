@@ -33,6 +33,10 @@ namespace SPaPS.Models.AccountModels
         [Display(Name = "Country")]
         public int? CountryId { get; set; }
 
-        public string Role { get; set; }
+        public string? Role { get; set; }
+        public int? NoOfEmployees { get; set; }
+        public DateTime? DateOfEstablishment { get; set; }
+
+
     }
 }
